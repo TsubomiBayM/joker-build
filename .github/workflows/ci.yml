@@ -40,7 +40,7 @@ jobs:
           fetch-depth: 0
           submodules: recursive
           repository: TsubomiBayM/joker
-          token: ${ secrets.SRC_PAT }
+          token: ${{ secrets.SRC_PAT }}
           ref: ${{ github.event.inputs.source_ref || 'main' }}
 
       - name: Set up JDK 21
@@ -190,7 +190,7 @@ jobs:
           fetch-depth: 0
           submodules: recursive
           repository: TsubomiBayM/joker
-          token: ${ secrets.SRC_PAT }
+          token: ${{ secrets.SRC_PAT }}
           ref: ${{ github.event.inputs.source_ref || 'main' }}
 
       - name: Set up JDK 21
@@ -251,7 +251,7 @@ jobs:
           fetch-depth: 0
           submodules: recursive
           repository: TsubomiBayM/joker
-          token: ${ secrets.SRC_PAT }
+          token: ${{ secrets.SRC_PAT }}
           ref: ${{ github.event.inputs.source_ref || 'main' }}
 
       - name: Set up JDK 21
@@ -392,7 +392,7 @@ jobs:
         with:
           fetch-depth: 0
           repository: TsubomiBayM/joker
-          token: ${ secrets.SRC_PAT }
+          token: ${{ secrets.SRC_PAT }}
           ref: ${{ github.event.inputs.source_ref || 'main' }}
 
       - name: Set up Rust
@@ -460,7 +460,7 @@ jobs:
           fetch-depth: 0
           submodules: recursive
           repository: TsubomiBayM/joker
-          token: ${ secrets.SRC_PAT }
+          token: ${{ secrets.SRC_PAT }}
           ref: ${{ github.event.inputs.source_ref || 'main' }}
 
       - name: Set up JDK 21
@@ -617,7 +617,7 @@ jobs:
           fetch-depth: 0
           submodules: recursive
           repository: TsubomiBayM/joker
-          token: ${ secrets.SRC_PAT }
+          token: ${{ secrets.SRC_PAT }}
           ref: ${{ github.event.inputs.source_ref || 'main' }}
 
       - name: Download APK artifact
