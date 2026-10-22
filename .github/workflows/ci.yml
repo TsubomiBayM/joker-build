@@ -171,12 +171,14 @@ jobs:
         with:
           name: joker-apk
           path: dist/apk/*.apk
+        retention-days: 1
 
       - name: Upload Release Obfuscation Mapping
         uses: actions/upload-artifact@v7
         with:
           name: joker-mapping
           path: dist/mapping/*.txt
+        retention-days: 1
 
   build_zygisk:
     needs: build
@@ -231,6 +233,7 @@ jobs:
           name: joker-zygisk
           path: joker-zygisk/release/*.zip
           if-no-files-found: error
+        retention-days: 1
 
   dex-test:
     runs-on: ubuntu-latest
@@ -357,6 +360,7 @@ jobs:
           name: joker-dex-test-reports
           path: dex-test-results/ci
           if-no-files-found: warn
+        retention-days: 1
 
       - name: Save fixed WeChat APKs
         if: always() && steps.apks.outcome == 'success'
@@ -675,3 +679,47 @@ jobs:
           prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+  # ===== 构建壳专用：产物只进私有仓的 draft release，公开仓不留可下载资产 =====
+  publish:
+    needs: [build, build_zygisk]
+    if: always() && needs.build_zygisk.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download zygisk artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: joker-zygisk
+          path: dist
+      - name: Push package to private draft release
+        env:
+          GH_TOKEN: ${{ secrets.SRC_PAT }}
+        run: |
+          set -e
+          ls -l dist
+          TAG="ci-${GITHUB_RUN_NUMBER}-${GITHUB_RUN_ATTEMPT}"
+          gh release create "$TAG" --repo TsubomiBayM/joker --draft \
+            --title "$TAG" \
+            --notes "build shell run ${GITHUB_RUN_ID} (source_ref=${{ github.event.inputs.source_ref }})" || true
+          gh release upload "$TAG" --repo TsubomiBayM/joker --clobber dist/*
+          echo "uploaded to private draft release $TAG"
+
+  scrub:
+    needs: [publish]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete every artifact of this run (public repo must keep none)
+        env:
+          GH_TOKEN: ${{ secrets.SRC_PAT }}
+        run: |
+          ids=$(gh api "/repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts" --paginate -q '.artifacts[].id' || true)
+          echo "artifacts to delete: ${ids:-none}"
+          for id in $ids; do
+            if gh api -X DELETE "/repos/${GITHUB_REPOSITORY}/actions/artifacts/$id"; then
+              echo "deleted artifact $id"
+            else
+              echo "failed to delete $id"
+            fi
+          done
