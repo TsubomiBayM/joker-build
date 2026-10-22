@@ -171,14 +171,14 @@ jobs:
         with:
           name: joker-apk
           path: dist/apk/*.apk
-        retention-days: 1
+          retention-days: 1
 
       - name: Upload Release Obfuscation Mapping
         uses: actions/upload-artifact@v7
         with:
           name: joker-mapping
           path: dist/mapping/*.txt
-        retention-days: 1
+          retention-days: 1
 
   build_zygisk:
     needs: build
@@ -233,7 +233,7 @@ jobs:
           name: joker-zygisk
           path: joker-zygisk/release/*.zip
           if-no-files-found: error
-        retention-days: 1
+          retention-days: 1
 
   dex-test:
     runs-on: ubuntu-latest
@@ -360,7 +360,7 @@ jobs:
           name: joker-dex-test-reports
           path: dex-test-results/ci
           if-no-files-found: warn
-        retention-days: 1
+          retention-days: 1
 
       - name: Save fixed WeChat APKs
         if: always() && steps.apks.outcome == 'success'
